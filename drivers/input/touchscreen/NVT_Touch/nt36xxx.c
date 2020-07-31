@@ -450,7 +450,7 @@ static ssize_t nvt_gesture_mode_set_proc(struct file *filp,
 	char msg[20];
 	int ret = 0;
 
-	ret = copy_from_user(msg, buffer, count);
+	ret = raw_copy_from_user(msg, buffer, count);
 	if (ret) {
 		return -EFAULT;
 	}
@@ -851,7 +851,7 @@ static ssize_t nvt_flash_read(struct file *file, char __user *buff, size_t count
 		return -EFAULT;
 	}
 
-	if (copy_from_user(str, buff, count)) {
+	if (raw_copy_from_user(str, buff, count)) {
 		NVT_ERR("copy from user error\n");
 		return -EFAULT;
 	}
@@ -894,7 +894,7 @@ static ssize_t nvt_flash_read(struct file *file, char __user *buff, size_t count
 
 		// copy buff to user if i2c transfer
 		if (retries < 20) {
-			if (copy_to_user(buff, str, count))
+			if (raw_copy_to_user(buff, str, count))
 				return -EFAULT;
 		}
 
