@@ -146,3 +146,7 @@ config SND_SOC_MSM_SDW
 
 config SND_SOC_MSM_HDMI_CODEC_RX
 	tristate "SND_SOC_MSM_HDMI_CODEC_RX"
+
+config SND_SOC_TFA9874
+    tristate "NXP Semiconductors TFA9874 amplifier"
+	depends on I2C
