@@ -814,7 +814,7 @@ static ssize_t devkmsg_write(struct kiocb *iocb, struct iov_iter *from)
 			len -= endp - line;
 			line = endp;
 			/* QG-D */
-			if (strstr(line, "healthd"))
+			if (strstr(line, "healthd") || strstr(line, "init"))
 				goto free;
 		}
 	}
