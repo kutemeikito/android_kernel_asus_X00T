@@ -381,7 +381,7 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	switch (cmd) {
 	case GF_IOC_INIT:
 		pr_debug("%s GF_IOC_INIT\n", __func__);
-		if (copy_to_user((void __user *)arg, (void *)&netlink_route, sizeof(u8))) {
+		if (raw_copy_to_user((void __user *)arg, (void *)&netlink_route, sizeof(u8))) {
 			retval = -EFAULT;
 			break;
 		}
@@ -402,7 +402,7 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		gf_hw_reset(gf_dev, 3);
 		break;
 	case GF_IOC_INPUT_KEY_EVENT:
-		if (copy_from_user(&gf_key, (struct gf_key *)arg, sizeof(struct gf_key))) {
+		if (raw_copy_from_user(&gf_key, (struct gf_key *)arg, sizeof(struct gf_key))) {
 			pr_info("Failed to copy input key event from user to kernel\n");
 			retval = -EFAULT;
 			break;
@@ -413,7 +413,7 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 #if defined(SUPPORT_NAV_EVENT)
 	case GF_IOC_NAV_EVENT:
 		pr_debug("%s GF_IOC_NAV_EVENT\n", __func__);
-		if (copy_from_user(&nav_event, (gf_nav_event_t *)arg, sizeof(gf_nav_event_t))) {
+		if (raw_copy_from_user(&nav_event, (gf_nav_event_t *)arg, sizeof(gf_nav_event_t))) {
 			pr_info("Failed to copy nav event from user to kernel\n");
 			retval = -EFAULT;
 			break;
@@ -466,7 +466,7 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		break;
 	case GF_IOC_CHIP_INFO:
 		pr_debug("%s GF_IOC_CHIP_INFO\n", __func__);
-		if (copy_from_user(&info, (struct gf_ioc_chip_info *)arg, sizeof(struct gf_ioc_chip_info))) {
+		if (raw_copy_from_user(&info, (struct gf_ioc_chip_info *)arg, sizeof(struct gf_ioc_chip_info))) {
 			retval = -EFAULT;
 			break;
 		}

@@ -22,7 +22,7 @@
 
 #include "fingerprint_common.h"
 
-#include <linux/switch.h>
+//#include <linux/switch.h>
 
 
 #define DEV_NAME "common,fingerprint"
