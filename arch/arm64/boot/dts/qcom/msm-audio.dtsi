@@ -823,20 +823,6 @@
 		#clock-cells = <1>;
 	};
 
-	clock_audio_native: audio_ext_clk_native {
-		status = "disabled";
-		compatible = "qcom,audio-ref-clk";
-		qcom,codec-ext-clk-src = <3>;
-		qcom,use-pinctrl = <1>;
-		clock-names = "osr_clk";
-		#clock-cells = <1>;
-		qcom,codec-mclk-clk-freq = <11289600>;
-		qcom,mclk-clk-reg = <0x15020018 0x0>;
-		pinctrl-names = "sleep", "active";
-		pinctrl-0 = <&lpi_mclk0_sleep>;
-		pinctrl-1 = <&lpi_mclk0_active>;
-	};
-
 	clock_audio_lnbb: audio_ext_clk_lnbb {
 		compatible = "qcom,audio-ref-clk";
 		qcom,codec-ext-clk-src = <1>;
