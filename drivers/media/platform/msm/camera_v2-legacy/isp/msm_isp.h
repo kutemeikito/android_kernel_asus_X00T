@@ -19,9 +19,6 @@
 #include <linux/io.h>
 #include <linux/list.h>
 #include <linux/delay.h>
-#ifdef CONFIG_MSM_AVTIMER
-#include <linux/avtimer_kernel.h>
-#endif
 #include <media/v4l2-subdev.h>
 #include <media/msmb_isp-legacy.h>
 #include <linux/msm-bus.h>
@@ -87,7 +84,8 @@ enum msm_isp_irq_operation {
 };
 
 /* This struct is used to save/track SOF info for some INTF.
- * e.g. used in Master-Slave mode */
+ * e.g. used in Master-Slave mode
+ */
 struct msm_vfe_sof_info {
 	uint32_t timestamp_ms;
 	uint32_t mono_timestamp_ms;

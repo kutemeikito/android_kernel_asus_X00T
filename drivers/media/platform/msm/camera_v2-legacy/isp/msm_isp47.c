@@ -12,7 +12,8 @@
 
 #include <linux/module.h>
 #include <linux/ratelimit.h>
-
+#include <linux/clk.h>
+#include <linux/sched/clock.h>
 
 #include "msm_isp_util.h"
 #include "msm_isp_axi_util.h"
@@ -142,8 +143,10 @@ static struct msm_bus_paths msm_isp_bus_client_config[] = {
 
 static struct msm_bus_scale_pdata msm_isp_bus_client_pdata = {
 	msm_isp_bus_client_config,
+	NULL,
 	ARRAY_SIZE(msm_isp_bus_client_config),
 	.name = "msm_camera_isp",
+	0
 };
 
 uint32_t msm_vfe47_ub_reg_offset(struct vfe_device *vfe_dev, int wm_idx)
@@ -324,7 +327,7 @@ int msm_vfe47_init_hardware(struct vfe_device *vfe_dev)
 								vfe_dev, 1);
 	if (rc)
 		goto enable_regulators_failed;
-
+	msm_isp_update_bandwidth(vfe_dev->pdev->id, 0x1000, 0x1000);
 	rc = vfe_dev->hw_info->vfe_ops.platform_ops.enable_clks(
 							vfe_dev, 1);
 	if (rc)

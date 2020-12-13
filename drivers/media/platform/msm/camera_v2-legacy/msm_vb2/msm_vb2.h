@@ -17,7 +17,6 @@
 #include <linux/i2c.h>
 #include <linux/videodev2.h>
 #include <linux/pm_qos.h>
-#include <linux/wakelock.h>
 #include <linux/msm_ion.h>
 #include <linux/iommu.h>
 #include <media/v4l2-dev.h>
@@ -47,7 +46,7 @@ struct msm_vb2_private_data {
 	void *vaddr;
 	unsigned long size;
 	/* Offset of the plane inside the buffer */
-	void *alloc_ctx;
+	struct device *alloc_ctx;
 };
 
 struct msm_stream {

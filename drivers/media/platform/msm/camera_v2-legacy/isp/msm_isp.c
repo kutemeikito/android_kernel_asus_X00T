@@ -464,16 +464,16 @@ static void isp_vma_close(struct vm_area_struct *vma)
 	pr_debug("%s: close called\n", __func__);
 }
 
-static int isp_vma_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
+static int isp_vma_fault(struct vm_fault *vmf)
 {
 	struct page *page;
-	struct vfe_device *vfe_dev = vma->vm_private_data;
+	struct vfe_device *vfe_dev = vmf->vma->vm_private_data;
 	struct isp_kstate *isp_page = NULL;
 
 	isp_page = vfe_dev->isp_page;
 
 	pr_debug("%s: vfeid:%d u_virt_addr:0x%lx k_virt_addr:%pK\n",
-		__func__, vfe_dev->pdev->id, vma->vm_start,
+		__func__, vfe_dev->pdev->id, vmf->vma->vm_start,
 		(void *)isp_page);
 	if (isp_page != NULL) {
 		page = virt_to_page(isp_page);
@@ -575,10 +575,9 @@ static int vfe_probe(struct platform_device *pdev)
 	memset(&vfe_common_data, 0, sizeof(vfe_common_data));
 	mutex_init(&vfe_common_data.vfe_common_mutex);
 	spin_lock_init(&vfe_common_data.common_dev_data_lock);
-	spin_lock_init(&vfe_common_data.vfe_irq_dump.
-			common_dev_irq_dump_lock);
-	spin_lock_init(&vfe_common_data.vfe_irq_dump.
-			common_dev_tasklet_dump_lock);
+	spin_lock_init(&vfe_common_data.vfe_irq_dump.common_dev_irq_dump_lock);
+	spin_lock_init(
+		&vfe_common_data.vfe_irq_dump.common_dev_tasklet_dump_lock);
 	for (i = 0; i < (VFE_AXI_SRC_MAX * MAX_VFE); i++)
 		spin_lock_init(&(vfe_common_data.streams[i].lock));
 	for (i = 0; i < (MSM_ISP_STATS_MAX * MAX_VFE); i++)
@@ -720,8 +719,7 @@ int vfe_hw_probe(struct platform_device *pdev)
 	spin_lock_init(&req_history_lock);
 	spin_lock_init(&vfe_dev->reset_completion_lock);
 	spin_lock_init(&vfe_dev->halt_completion_lock);
-	media_entity_init(&vfe_dev->subdev.sd.entity, 0, NULL, 0);
-	vfe_dev->subdev.sd.entity.type = MEDIA_ENT_T_V4L2_SUBDEV;
+	media_entity_pads_init(&vfe_dev->subdev.sd.entity, 0, NULL);
 	vfe_dev->subdev.sd.entity.group_id = MSM_CAMERA_SUBDEV_VFE;
 	vfe_dev->subdev.sd.entity.name = pdev->name;
 	vfe_dev->subdev.close_seq = MSM_SD_CLOSE_1ST_CATEGORY | 0x2;
