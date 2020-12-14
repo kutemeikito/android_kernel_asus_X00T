@@ -11,7 +11,7 @@ obj-$(CONFIG_SPECTRA_CAMERA) += camera/
 obj-$(CONFIG_MSM_AIS) += ais/
 obj-$(CONFIG_TSPP) += broadcast/
 obj-$(CONFIG_DVB_MPQ) += dvb/
-ifdef CONFIG_MACH_ASUS_SDM660
+ifdef CONFIG_MSMB_CAMERA_LEGACY
 obj-$(CONFIG_MSMB_CAMERA) += camera_v2-legacy/
 else
 obj-$(CONFIG_MSMB_CAMERA) += camera_v2/
