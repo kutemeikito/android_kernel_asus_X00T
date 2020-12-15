@@ -12,6 +12,7 @@
 
 &pm660l_wled {
 	status = "okay";
+	/delete-property/ qcom,auto-calibration;
 };
 
 &pm660l_lcdb {
