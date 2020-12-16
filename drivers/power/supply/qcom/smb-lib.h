@@ -318,6 +318,21 @@ struct smb_charger {
 	struct delayed_work	uusb_otg_work;
 	struct delayed_work	bb_removal_work;
 
+#ifdef CONFIG_MACH_ASUS_X00T
+	/* Adapter ID */
+	struct delayed_work	asus_chg_flow_work;
+	struct delayed_work	asus_adapter_adc_work;
+
+	/* Realize jeita */
+	struct delayed_work	asus_min_monitor_work;
+
+	/* sw jeita per min in suspend */
+	struct delayed_work asus_batt_RTC_work;
+
+	/* USB alert */
+	struct qpnp_vadc_chip *gpio12_vadc_dev;
+#endif
+
 	/* cached status */
 	int			voltage_min_uv;
 	int			voltage_max_uv;
@@ -385,6 +400,14 @@ struct smb_charger {
 	int			die_health;
 };
 
+#ifdef CONFIG_MACH_ASUS_X00T /* Adapter ID */
+/* ASUS BSP : gpio control struct */
+struct gpio_control {
+	u32 ADC_SW_EN;
+	u32 ADCPWREN_PMI_GP1;
+};
+#endif
+
 int smblib_read(struct smb_charger *chg, u16 addr, u8 *val);
 int smblib_masked_write(struct smb_charger *chg, u16 addr, u8 mask, u8 val);
 int smblib_write(struct smb_charger *chg, u16 addr, u8 val);
@@ -434,6 +457,10 @@ irqreturn_t smblib_handle_wdog_bark(int irq, void *data);
 
 int smblib_get_prop_input_suspend(struct smb_charger *chg,
 				union power_supply_propval *val);
+#ifdef CONFIG_MACH_ASUS_X00T
+int smblib_get_prop_charging_enabled(struct smb_charger *chg,
+				union power_supply_propval *val);
+#endif
 int smblib_get_prop_batt_present(struct smb_charger *chg,
 				union power_supply_propval *val);
 int smblib_get_prop_batt_capacity(struct smb_charger *chg,
@@ -454,6 +481,10 @@ int smblib_get_prop_input_current_limited(struct smb_charger *chg,
 				union power_supply_propval *val);
 int smblib_set_prop_input_suspend(struct smb_charger *chg,
 				const union power_supply_propval *val);
+#ifdef CONFIG_MACH_ASUS_X00T
+int smblib_set_prop_charging_enabled(struct smb_charger *chg,
+				const union power_supply_propval *val);
+#endif
 int smblib_set_prop_batt_capacity(struct smb_charger *chg,
 				const union power_supply_propval *val);
 int smblib_set_prop_batt_status(struct smb_charger *chg,
