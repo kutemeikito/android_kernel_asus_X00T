@@ -31,7 +31,7 @@
 
 #ifdef CONFIG_MACH_ASUS_X00T
 #include <linux/of_gpio.h>
-#include <linux/wakelock.h>
+#include <linux/pm_wakeup.h>
 #include <linux/uaccess.h>
 #include <linux/proc_fs.h>
 #include <asm-generic/errno-base.h>
@@ -199,7 +199,7 @@ struct smb2 {
 #ifdef CONFIG_MACH_ASUS_X00T
 struct smb_charger *smbchg_dev;
 struct timespec last_jeita_time;
-struct wake_lock asus_chg_lock;
+struct wakeup_source asus_chg_lock;
 extern void smblib_asus_monitor_start(struct smb_charger *chg, int time);
 extern bool asus_get_prop_usb_present(struct smb_charger *chg);
 extern void asus_smblib_stay_awake(struct smb_charger *chg);
@@ -2709,7 +2709,7 @@ static int smb2_probe(struct platform_device *pdev)
 
 #ifdef CONFIG_MACH_ASUS_X00T
 	/* Realize jeita */
-	wake_lock_init(&asus_chg_lock, WAKE_LOCK_SUSPEND, "asus_chg_lock");
+	wakeup_source_init(&asus_chg_lock, "asus_chg_lock");
 	
 	/* ASUS BSP globe device struct */
 	smbchg_dev = chg;

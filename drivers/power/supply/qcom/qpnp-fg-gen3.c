@@ -829,7 +829,7 @@ static int fg_get_batt_profile(struct fg_dev *fg)
 	}
 
 #ifdef CONFIG_MACH_ASUS_X00T
-	strcpy(battery_name.battery_name_type,chip->bp.batt_type_str);
+	strcpy(battery_name.battery_name_type,fg->bp.batt_type_str);
 	battery_switch_register();
 #endif
 
@@ -1553,7 +1553,7 @@ static int fg_charge_full_update(struct fg_dev *fg)
 				msoc);
 		}
 #ifdef CONFIG_MACH_ASUS_X00T /*  optimize discharge capacity jump 1% */
-	} else if ((msoc_raw <= recharge_soc || !chip->charge_done) && chip->charge_full) {
+	} else if ((msoc_raw <= recharge_soc || !fg->charge_done) && fg->charge_full) {
 #else
 	} else if ((msoc_raw <= recharge_soc || !fg->charge_done)
 			&& fg->charge_full) {
@@ -5459,14 +5459,14 @@ static void fg_gen3_shutdown(struct platform_device *pdev)
 
 #ifdef CONFIG_MACH_ASUS_X00T
 	u8 status;
-	rc = fg_read(chip, BATT_INFO_BATT_MISS_CFG(chip), &status, 1);
+	rc = fg_read(fg, BATT_INFO_BATT_MISS_CFG(fg), &status, 1);
 	pr_info("fg_gen3_shutdown status0=%d\n",status);
-	rc = fg_masked_write(chip, BATT_INFO_BATT_MISS_CFG(chip),
+	rc = fg_masked_write(fg, BATT_INFO_BATT_MISS_CFG(fg),
 			BM_FROM_BATT_ID_BIT, 0);
 	if (rc < 0)
 		pr_err("Error in writing to %04x, rc=%d\n",
-			BATT_INFO_BATT_MISS_CFG(chip), rc);
-	rc = fg_read(chip, BATT_INFO_BATT_MISS_CFG(chip), &status, 1);
+			BATT_INFO_BATT_MISS_CFG(fg), rc);
+	rc = fg_read(fg, BATT_INFO_BATT_MISS_CFG(fg), &status, 1);
 	pr_info("fg_gen3_shutdown status1=%d\n",status);
 #endif
 

@@ -30,7 +30,7 @@
 #include "fg-core.h"
 #include <linux/gpio.h>
 #include <linux/alarmtimer.h>
-#include <linux/wakelock.h>
+#include <linux/pm_wakeup.h>
 #include <linux/unistd.h>
 #include <linux/fcntl.h>
 #include <linux/slab.h>
@@ -139,14 +139,14 @@ static void asus_smblib_rerun_aicl(struct smb_charger *chg)
 	smblib_masked_write(chg, USBIN_AICL_OPTIONS_CFG_REG,
 			USBIN_AICL_EN_BIT, USBIN_AICL_EN_BIT);
 }
-extern struct wake_lock asus_chg_lock;
+extern struct wakeup_source asus_chg_lock;
 void asus_smblib_stay_awake(struct smb_charger *chg)
 {
-	wake_lock(&asus_chg_lock);
+	__pm_stay_awake(&asus_chg_lock);
 }
 void asus_smblib_relax(struct smb_charger *chg)
 {
-	wake_unlock(&asus_chg_lock);
+	__pm_relax(&asus_chg_lock);
 }
 #endif /* CONFIG_MACH_ASUS_X00T */
 
@@ -901,8 +901,8 @@ void smblib_suspend_on_debug_battery(struct smb_charger *chg)
 	/* Adapter ID */
 	if (gpio_is_valid(global_gpio->ADC_SW_EN)) {
 		pr_debug("smblib_uusb_removal gpio_is_valid gpio_ADC_SW_EN=%d\n",global_gpio->ADC_SW_EN);
-		val = gpio_get_value(global_gpio->ADC_SW_EN);
-		if(val==1){
+		val.intval = gpio_get_value(global_gpio->ADC_SW_EN);
+		if(val.intval == 1){
 			rc = gpio_direction_output(global_gpio->ADC_SW_EN, 0);
 			if (rc)
 				pr_debug("%s: failed to pull-low ADC_SW_EN-gpios59\n", __func__);
@@ -912,8 +912,8 @@ void smblib_suspend_on_debug_battery(struct smb_charger *chg)
 		else
 			pr_debug("%s: get USBSW_S gpio val %d\n", __func__,val);
 	}
-	val = gpio_get_value(global_gpio->ADCPWREN_PMI_GP1);
-	if(val==1){
+	val.intval = gpio_get_value(global_gpio->ADCPWREN_PMI_GP1);
+	if(val.intval == 1){
 		rc = gpio_direction_output(global_gpio->ADCPWREN_PMI_GP1, 0);
 		if (rc)
 			pr_debug("%s: failed to pull-low ADCPWREN_PMI_GP1-gpios34\n", __func__);
