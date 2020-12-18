@@ -18,7 +18,6 @@
 #include "sdm660-common-overlay.dtsi"
 #include "sdm660-camera-overlay.dtsi"
 #include "msm-audio-overlay.dtsi"
-#include "sdm660-audio-overlay.dtsi"
 #include "sdm660-lpi-overlay.dtsi"
 #include "dsi-panel-nt36672-1080p-video-txd.dtsi"
 #include "dsi-panel-nt36672-1080p-video.dtsi"
