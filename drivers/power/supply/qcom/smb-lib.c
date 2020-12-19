@@ -3839,6 +3839,8 @@ static int jeita_status_regs_write(u8 chg_en, u8 FV_CFG, u8 FCC)
 	return 0;
 }
 
+#if 0 /* Skip asus usb alert setup and check */
+
 /* USB alert */
 void asus_update_usb_connector_state(struct smb_charger *chip)
 {
@@ -3903,6 +3905,7 @@ void asus_update_usb_connector_state(struct smb_charger *chip)
 	}
 
 }
+#endif
 
 void jeita_rule(void)
 {
@@ -4017,7 +4020,7 @@ void asus_min_monitor_work(struct work_struct *work)
 
 	/* USB alert */
 	if(usb_otg_present){
-		asus_update_usb_connector_state(smbchg_dev);
+		//asus_update_usb_connector_state(smbchg_dev);
 		last_jeita_time = current_kernel_time();
 		schedule_delayed_work(&smbchg_dev->asus_min_monitor_work, msecs_to_jiffies(ASUS_MONITOR_CYCLE));
 		schedule_delayed_work(&smbchg_dev->asus_batt_RTC_work, 0);
@@ -4044,7 +4047,7 @@ void asus_min_monitor_work(struct work_struct *work)
 	}
 
 	/* USB alert */
-	asus_update_usb_connector_state(smbchg_dev);
+	//asus_update_usb_connector_state(smbchg_dev);
 
 	if (asus_get_prop_usb_present(smbchg_dev)) {
 		/* sw jeita per min in suspend */
@@ -4236,6 +4239,9 @@ void asus_adapter_adc_work(struct work_struct *work)
 		CHG_DBG_E("%s: Failed to set USBIN_OPTIONS_1_CFG_REG\n", __func__);
 
 	msleep(5);
+	
+/*Skip Adapter ID check */
+#if 0
 	CHG_TYPE_judge(smbchg_dev);
 	/* Determine current-setting value for DCP type AC: */
 	switch (ASUS_ADAPTER_ID) {
@@ -4249,6 +4255,9 @@ void asus_adapter_adc_work(struct work_struct *work)
 		usb_max_current = ICL_1000mA;
 		break;
 	}
+#endif
+	usb_max_current = ICL_2000mA;
+	
 	rc = smblib_set_usb_suspend(smbchg_dev, 0);
 	if (rc < 0)
 		printk("%s: Couldn't set 1340_USBIN_SUSPEND_BIT 0\n", __func__);
@@ -4573,7 +4582,7 @@ static void smblib_micro_usb_plugin(struct smb_charger *chg, bool vbus_rising)
 			asus_insertion_initial_settings(smbchg_dev);
 			asus_smblib_stay_awake(smbchg_dev);
 			schedule_delayed_work(&smbchg_dev->asus_chg_flow_work, msecs_to_jiffies(12000));
-			asus_update_usb_connector_state(smbchg_dev);
+			//asus_update_usb_connector_state(smbchg_dev);
 		}
 #endif
 
