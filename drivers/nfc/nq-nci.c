@@ -141,8 +141,15 @@ static irqreturn_t nqx_dev_irq_handler(int irq, void *dev_id)
 	struct nqx_dev *nqx_dev = dev_id;
 	unsigned long flags;
 
+#ifdef CONFIG_MACH_ASUS_X00T
+	if (device_may_wakeup(&nqx_dev->client->dev)) {
+		dev_info(&nqx_dev->client->dev, "[NFC][Kernel] Wakelock 5 sec to notify NFC framework\n");
+		pm_wakeup_event(&nqx_dev->client->dev, WAKEUP_SRC_TIMEOUT);
+	}
+#else
 	if (device_may_wakeup(&nqx_dev->client->dev))
 		pm_wakeup_event(&nqx_dev->client->dev, WAKEUP_SRC_TIMEOUT);
+#endif
 
 	nqx_disable_irq(nqx_dev);
 	spin_lock_irqsave(&nqx_dev->irq_enabled_lock, flags);
@@ -560,13 +567,19 @@ int nfc_ioctl_power_states(struct file *filp, unsigned long arg)
 	int r = 0;
 	struct nqx_dev *nqx_dev = filp->private_data;
 
+#ifdef CONFIG_MACH_ASUS_X00T
+	dev_info(&nqx_dev->client->dev, "[NFC] nfc_ioctl_power_states:%lu\n", arg);
+#endif
+
 	if (arg == 0) {
 		/*
 		 * We are attempting a hardware reset so let us disable
 		 * interrupts to avoid spurious notifications to upper
 		 * layers.
 		 */
+#ifndef CONFIG_MACH_ASUS_X00T
 		nqx_disable_irq(nqx_dev);
+#endif
 		dev_dbg(&nqx_dev->client->dev,
 			"gpio_set_value disable: %s: info: %p\n",
 			__func__, nqx_dev);
@@ -623,6 +636,9 @@ int nfc_ioctl_power_states(struct file *filp, unsigned long arg)
 		 * We are switching to Dowload Mode, toggle the enable pin
 		 * in order to set the NFCC in the new mode
 		 */
+#ifdef CONFIG_MACH_ASUS_X00T
+		dev_info(&nqx_dev->client->dev, "[NFC] We are switching to Download Mode.\n");
+#endif
 		if (gpio_is_valid(nqx_dev->ese_gpio)) {
 			if (gpio_get_value(nqx_dev->ese_gpio)) {
 				dev_err(&nqx_dev->client->dev,
@@ -630,6 +646,12 @@ int nfc_ioctl_power_states(struct file *filp, unsigned long arg)
 				return -EBUSY; /* Device or resource busy */
 			}
 		}
+#ifdef CONFIG_MACH_ASUS_X00T
+		if (!nqx_dev->irq_enabled) {
+			dev_info(&nqx_dev->client->dev, "[NFC] enable irq for FW Dowload Mode.");
+			nqx_enable_irq(nqx_dev);
+		}
+#endif
 		gpio_set_value(nqx_dev->en_gpio, 1);
 		usleep_range(10000, 10100);
 		if (gpio_is_valid(nqx_dev->firm_gpio)) {
@@ -1444,12 +1466,15 @@ static int nqx_probe(struct i2c_client *client,
 	 *
 	 */
 	r = nfcc_hw_check(client, nqx_dev);
+
+#ifndef CONFIG_MACH_ASUS_X00T
 	if (r) {
 		/* make sure NFCC is not enabled */
 		gpio_set_value(platform_data->en_gpio, 0);
 		/* We don't think there is hardware switch NFC OFF */
 		goto err_request_hw_check_failed;
 	}
+#endif
 
 	/* Register reboot notifier here */
 	r = register_reboot_notifier(&nfcc_notifier);

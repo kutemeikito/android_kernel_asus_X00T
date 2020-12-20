@@ -41,7 +41,13 @@
 #define DEVICE_NAME	"nq-nci"
 #define CLASS_NAME	"nqx"
 #define MAX_BUFFER_SIZE			(320)
+
+#ifdef CONFIG_MACH_ASUS_X00T
+#define WAKEUP_SRC_TIMEOUT		(5000)
+#else
 #define WAKEUP_SRC_TIMEOUT		(2000)
+#endif
+
 #define MAX_RETRY_COUNT			3
 #define NCI_RESET_CMD_LEN		4
 #define NCI_RESET_RSP_LEN		6
