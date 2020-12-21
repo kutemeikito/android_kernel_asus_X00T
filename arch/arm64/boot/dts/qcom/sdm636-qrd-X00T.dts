@@ -12,7 +12,7 @@
 
 /dts-v1/;
 #include "sdm636.dtsi"
-#include "sdm636-qrd.dtsi"
+#include "sdm660-qrd.dtsi"
 #include "sdm660-internal-codec.dtsi"
 
 #include "X00T/sdm636-overlay.dtsi"
