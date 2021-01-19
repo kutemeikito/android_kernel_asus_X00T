@@ -13,6 +13,9 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/fs.h>
+#ifdef CONFIG_MACH_ASUS_X00T
+#include <linux/proc_fs.h>
+#endif
 #include <linux/reboot.h>
 #include <linux/slab.h>
 #include <linux/irq.h>
@@ -84,6 +87,10 @@ struct nqx_dev {
 	u8 *kbuf;
 	struct nqx_platform_data *pdata;
 };
+
+#ifdef CONFIG_MACH_ASUS_X00T
+static bool has_nfc;
+#endif
 
 static int nfcc_reboot(struct notifier_block *notifier, unsigned long val,
 			void *v);
@@ -169,6 +176,31 @@ static int is_data_available_for_read(struct nqx_dev *nqx_dev)
 		!nqx_dev->irq_enabled, msecs_to_jiffies(MAX_IRQ_WAIT_TIME));
 	return ret;
 }
+
+#ifdef CONFIG_MACH_ASUS_X00T
+static ssize_t proc_has_nfc_show(struct file *file, char __user *user_buf,
+						size_t count, loff_t *ppos)
+{
+	int ret = 0;
+	char page[PAGESIZE] = {0};
+
+	if (has_nfc)
+		snprintf(page, PAGESIZE-1, "%s", "SUPPORTED");
+	else
+		snprintf(page, PAGESIZE-1, "%s", "NOT SUPPORTED");
+
+	ret = simple_read_from_buffer(user_buf, count, ppos, page,
+					strlen(page));
+	return ret;
+}
+
+static struct proc_dir_entry *has_nfc_proc = NULL;
+static const struct file_operations proc_has_nfc_fops = {
+	.read  = proc_has_nfc_show,
+	.open  = simple_open,
+	.owner = THIS_MODULE,
+};
+#endif
 
 static ssize_t nfc_read(struct file *filp, char __user *buf,
 					size_t count, loff_t *offset)
@@ -1132,6 +1164,10 @@ done:
 	kfree(nci_get_version_cmd);
 	kfree(nci_get_version_rsp);
 
+#ifdef CONFIG_MACH_ASUS_X00T
+	// When Success the ret must be 0
+	has_nfc = !ret;
+#endif
 	return ret;
 }
 
@@ -1474,6 +1510,12 @@ static int nqx_probe(struct i2c_client *client,
 		/* We don't think there is hardware switch NFC OFF */
 		goto err_request_hw_check_failed;
 	}
+	/* Show if hardware supports nfc. */
+	has_nfc_proc = proc_create("NFC_CHECK", 0444, NULL, &proc_has_nfc_fops);
+	if (has_nfc_proc == NULL)
+		dev_err(&client->dev, "%s: Couldn't create proc entry, %d\n",
+			__func__);
+
 #endif
 
 	/* Register reboot notifier here */

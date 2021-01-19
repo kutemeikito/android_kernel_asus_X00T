@@ -44,6 +44,7 @@
 
 #ifdef CONFIG_MACH_ASUS_X00T
 #define WAKEUP_SRC_TIMEOUT		(5000)
+#define PAGESIZE			512
 #else
 #define WAKEUP_SRC_TIMEOUT		(2000)
 #endif
